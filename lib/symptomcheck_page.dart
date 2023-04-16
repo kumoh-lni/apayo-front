@@ -1,47 +1,73 @@
+import 'dart:convert';
+
+import 'package:apayo/search_result_page.dart';
 import 'package:flutter/material.dart';
-import 'search_result_page.dart';
+import 'package:http/http.dart' as http;
 
 class SymptomCheckPage extends StatefulWidget {
-  final String selectedPart;
+  final int selectedPartId;
+  final String selectedPartName;
 
-  const SymptomCheckPage({Key? key, required this.selectedPart}) : super(key: key);
+  const SymptomCheckPage({
+    Key? key,
+    required this.selectedPartId,
+    required this.selectedPartName,
+  }) : super(key: key);
 
   @override
   _SymptomCheckPageState createState() => _SymptomCheckPageState();
 }
-
 class _SymptomCheckPageState extends State<SymptomCheckPage> {
-  final List<String> symptoms = [
-    '증상 1',
-    '증상 2',
-    '증상 3',
-    '증상 4',
-    '증상 5',
-    '증상 6',
-    '증상 7',
-    '증상 8',
-  ];
+  List<String> _symptoms = [];
+  List<bool> _isChecked = [];
 
-  final List<bool> isChecked = List<bool>.generate(8, (index) => false);
+  @override
+  void initState() {
+    super.initState();
+    _fetchData();
+  }
+
+  Future<void> _fetchData() async {
+    final String uri = 'http://10.0.2.2:8081/api/symptoms/${widget.selectedPartId}';
+
+    final client = http.Client();
+    try {
+      final response = await client.get(Uri.parse(uri));
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final symptoms = data['data'] as List<dynamic>;
+        setState(() {
+          _symptoms = symptoms.map((s) => s['korean_description'].toString()).toList();
+          _isChecked = List<bool>.generate(_symptoms.length, (index) => false);
+        });
+      } else {
+        // handle error
+      }
+    } catch (e) {
+      // handle error
+    } finally {
+      client.close();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('${widget.selectedPart} 관련 증상'),
+        title: Text('${widget.selectedPartName} 관련 증상'),
       ),
       body: ListView.builder(
-        itemCount: symptoms.length,
+        itemCount: _symptoms.length,
         itemBuilder: (context, index) {
           return CheckboxListTile(
             title: Text(
-              symptoms[index],
+              _symptoms[index],
               style: TextStyle(fontSize: 20),
             ),
-            value: isChecked[index],
+            value: _isChecked[index],
             onChanged: (bool? value) {
               setState(() {
-                isChecked[index] = value!;
+                _isChecked[index] = value!;
               });
             },
           );
@@ -52,7 +78,7 @@ class _SymptomCheckPageState extends State<SymptomCheckPage> {
         child: ElevatedButton(
           onPressed: () {
             // 체크된 증상이 있는지 확인
-            bool isCheckedSymptomExist = isChecked.contains(true);
+            bool isCheckedSymptomExist = _isChecked.contains(true);
 
             if (!isCheckedSymptomExist) {
               showDialog(
@@ -74,27 +100,17 @@ class _SymptomCheckPageState extends State<SymptomCheckPage> {
             }
 
             // 선택한 부위와 증상을 가져와서 SearchResultPage로 전달
-            final selectedPart = widget.selectedPart;
-            final selectedSymptoms = symptoms.where((symptom) => isChecked[symptoms.indexOf(symptom)]).toList();
+            final selectedPart = {'id': widget.selectedPartId, 'name': widget.selectedPartName};
+            final selectedSymptoms = _symptoms.where((symptom) => _isChecked[_symptoms.indexOf(symptom)]).toList();
 
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => SearchResultPage(
-                  selectedPart: selectedPart,
-                  selectedSymptoms: selectedSymptoms,
-                ),
+                builder: (context) => SearchResultPage(),
               ),
             );
           },
-          child: Text(
-            '검색',
-            style: TextStyle(fontSize: 20),
-          ),
-          style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all<Color>(Colors.blue),
-            fixedSize: MaterialStateProperty.all<Size>(Size.fromHeight(50)),
-          ),
+          child: Text('다음'),
         ),
       ),
     );

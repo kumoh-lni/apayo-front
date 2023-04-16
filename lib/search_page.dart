@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:apayo/search_result_page.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'symptomcheck_page.dart';
 
+import 'symptomcheck_page.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({Key? key}) : super(key: key);
@@ -14,10 +14,9 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
-  final String serverIP = '로컬 호스트 주소';
-  final String apiPath = '/api/parts';
+  final String uri = 'http://10.0.2.2:8081/api/parts';
 
-  List<String> _bodyParts = [];
+  List<Map<String, dynamic>> _bodyParts = [];
 
   @override
   void initState() {
@@ -28,12 +27,15 @@ class _SearchPageState extends State<SearchPage> {
   Future<void> _fetchData() async {
     final client = http.Client();
     try {
-      final response = await client.get(Uri.parse("http://$serverIP$apiPath"));
+      final response = await client.get(Uri.parse(uri));
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        final parts = data['data'] as List<dynamic>;
+        final data = utf8.decode(response.bodyBytes);
+        final parts = json.decode(data)['data'] as List<dynamic>;
         setState(() {
-          _bodyParts = parts.map((p) => p['name'].toString()).toList();
+          _bodyParts = parts.map<Map<String, dynamic>>((p) => {
+            'id': p['id'] as int,
+            'name': p['name'].toString(),
+          }).toList();
         });
       } else {
         // handle error
@@ -62,9 +64,17 @@ class _SearchPageState extends State<SearchPage> {
                 height: 100,
                 child: ElevatedButton(
                   onPressed: () {
-                    // handle button press
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SymptomCheckPage(
+                          selectedPartId: part['id'],
+                          selectedPartName: part['name'],
+                        ),
+                      ),
+                    );
                   },
-                  child: Text(part),
+                  child: Text(part['name']),
                 ),
               ),
             ),
