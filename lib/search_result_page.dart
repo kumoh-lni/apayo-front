@@ -27,7 +27,6 @@ class _SearchResultPageState extends State<SearchResultPage> {
       "text": "${widget.selectedSymptoms.join(", ")}",
       "age": {"value": 30}
     };
-
     final response = await http.post(
       Uri.parse(url),
       headers: {
@@ -42,6 +41,37 @@ class _SearchResultPageState extends State<SearchResultPage> {
       final responseBody = jsonDecode(response.body);
       final List<dynamic> mentionsList = responseBody['mentions'];
       mentions = mentionsList.map((e) => Mention.fromJson(e)).toList();
+
+      final List<Map<String, dynamic>> evidence = mentionsList
+          .map((e) => {'id': e['id'], 'choice_id': 'present'})
+          .toList();
+
+      final recommendSpecialistUrl = 'https://api.infermedica.com/v3/recommend_specialist';
+      final recommendSpecialistRequestBody = {
+        'sex': 'male',
+        'age': {'value': 30},
+        'evidence': evidence,
+      };
+
+      final recommendSpecialistResponse = await http.post(
+        Uri.parse(recommendSpecialistUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'App-Id': '7807e737',
+          'App-Key': _apiKey,
+        },
+        body: jsonEncode(recommendSpecialistRequestBody),
+      );
+
+      if (recommendSpecialistResponse.statusCode == 200) {
+        final recommendSpecialistResponseBody = jsonDecode(recommendSpecialistResponse.body);
+        final specialistName = recommendSpecialistResponseBody['recommended_specialist']['name'];
+
+        for (var mention in mentions) {
+          mention.recommendedSpecialistName = specialistName;
+        }
+      }
+
       return mentions;
     } else {
       throw Exception('Failed to fetch data');
@@ -65,6 +95,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
                   return ListTile(
                     title: Text(snapshot.data![index].name),
                     subtitle: Text(snapshot.data![index].commonName),
+                    trailing: Text(snapshot.data?[index].recommendedSpecialistName ?? ''),
                   );
                 },
               );
@@ -84,11 +115,13 @@ class Mention {
   final String id;
   final String name;
   final String commonName;
+  String? recommendedSpecialistName;
 
   Mention({
     required this.id,
     required this.name,
     required this.commonName,
+    this.recommendedSpecialistName,
   });
 
   factory Mention.fromJson(Map<String, dynamic> json) {
