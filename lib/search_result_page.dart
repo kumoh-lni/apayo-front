@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-class SearchResultPage extends StatelessWidget {
+class SearchResultPage extends StatefulWidget {
   final String selectedPart;
   final List<String> selectedSymptoms;
 
@@ -13,12 +13,18 @@ class SearchResultPage extends StatelessWidget {
     required this.selectedSymptoms,
   }) : super(key: key);
 
-  final String _apiKey = 'bbde03096c0e6e24fa444625d507ae1d';
+  @override
+  _SearchResultPageState createState() => _SearchResultPageState();
+}
 
-  Future<String> _fetchData() async {
+class _SearchResultPageState extends State<SearchResultPage> {
+  final String _apiKey = 'bbde03096c0e6e24fa444625d507ae1d';
+  List<Mention> mentions = [];
+
+  Future<List<Mention>> _fetchData() async {
     final String url = 'https://api.infermedica.com/v3/parse';
     final Map<String, dynamic> requestBody = {
-      "text": "${selectedSymptoms.join(", ")}",
+      "text": "${widget.selectedSymptoms.join(", ")}",
       "age": {"value": 30}
     };
 
@@ -33,7 +39,10 @@ class SearchResultPage extends StatelessWidget {
     );
 
     if (response.statusCode == 200) {
-      return response.body;
+      final responseBody = jsonDecode(response.body);
+      final List<dynamic> mentionsList = responseBody['mentions'];
+      mentions = mentionsList.map((e) => Mention.fromJson(e)).toList();
+      return mentions;
     } else {
       throw Exception('Failed to fetch data');
     }
@@ -43,14 +52,22 @@ class SearchResultPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('API 통신'),
+        title: const Text('검색 결과'),
       ),
       body: Center(
-        child: FutureBuilder<String>(
+        child: FutureBuilder<List<Mention>>(
           future: _fetchData(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              return Text(snapshot.data!);
+              return ListView.builder(
+                itemCount: snapshot.data!.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return ListTile(
+                    title: Text(snapshot.data![index].name),
+                    subtitle: Text(snapshot.data![index].commonName),
+                  );
+                },
+              );
             } else if (snapshot.hasError) {
               return Text('${snapshot.error}');
             } else {
@@ -59,6 +76,26 @@ class SearchResultPage extends StatelessWidget {
           },
         ),
       ),
+    );
+  }
+}
+
+class Mention {
+  final String id;
+  final String name;
+  final String commonName;
+
+  Mention({
+    required this.id,
+    required this.name,
+    required this.commonName,
+  });
+
+  factory Mention.fromJson(Map<String, dynamic> json) {
+    return Mention(
+      id: json['id'],
+      name: json['name'],
+      commonName: json['common_name'],
     );
   }
 }
