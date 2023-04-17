@@ -19,7 +19,7 @@ class SymptomCheckPage extends StatefulWidget {
 }
 
 class _SymptomCheckPageState extends State<SymptomCheckPage> {
-  List<String> _symptoms = [];
+  List<Map<String, String>> _symptoms = [];
   List<bool> _isChecked = [];
 
   @override
@@ -38,7 +38,10 @@ class _SymptomCheckPageState extends State<SymptomCheckPage> {
         final data = json.decode(response.body);
         final symptoms = data['data'] as List<dynamic>;
         setState(() {
-          _symptoms = symptoms.map((s) => s['korean_description'].toString()).toList();
+          _symptoms = symptoms.map((s) => {
+            'korean_description': s['korean_description'].toString(),
+            'english_description': s['english_description'].toString(),
+          }).toList();
           _isChecked = List<bool>.generate(_symptoms.length, (index) => false);
         });
       } else {
@@ -62,7 +65,7 @@ class _SymptomCheckPageState extends State<SymptomCheckPage> {
           itemBuilder: (context, index) {
             return CheckboxListTile(
               title: Text(
-                _symptoms[index],
+                _symptoms[index]['korean_description']!,
                 style: TextStyle(fontSize: 20),
               ),
               value: _isChecked[index],
@@ -101,21 +104,27 @@ class _SymptomCheckPageState extends State<SymptomCheckPage> {
     }
 
     // 선택한 부위와 증상을 가져와서 SearchResultPage로 전달
-    final selectedPart = {'id': widget.selectedPartId, 'name': widget.selectedPartName};
-    final selectedSymptoms = _symptoms.where((symptom) => _isChecked[_symptoms.indexOf(symptom)]).toList();
+    final selectedPart = {
+      'id': widget.selectedPartId,
+      'name': widget.selectedPartName
+    };
+    final selectedSymptoms = _symptoms
+        .where((symptom) => _isChecked[_symptoms.indexOf(symptom)])
+        .map((symptom) => symptom['english_description']!)
+        .toList();
 
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-        builder: (context) => SearchResultPage(
-        selectedPart: selectedPart.toString(),
-        selectedSymptoms: selectedSymptoms,
-        ),
-        ),
-    );
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SearchResultPage(
+              selectedPart: selectedPart.toString(),
+              selectedSymptoms: selectedSymptoms,
+            ),
+          ),
+        );
             },
               child: Text(
-                '검색하기',
+                '검색',
                 style: TextStyle(fontSize: 24),
               ),
             ),
