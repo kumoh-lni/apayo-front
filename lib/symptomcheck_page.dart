@@ -17,6 +17,7 @@ class SymptomCheckPage extends StatefulWidget {
   @override
   _SymptomCheckPageState createState() => _SymptomCheckPageState();
 }
+
 class _SymptomCheckPageState extends State<SymptomCheckPage> {
   List<String> _symptoms = [];
   List<bool> _isChecked = [];
@@ -53,66 +54,72 @@ class _SymptomCheckPageState extends State<SymptomCheckPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('${widget.selectedPartName} 관련 증상'),
-      ),
-      body: ListView.builder(
-        itemCount: _symptoms.length,
-        itemBuilder: (context, index) {
-          return CheckboxListTile(
-            title: Text(
-              _symptoms[index],
-              style: TextStyle(fontSize: 20),
-            ),
-            value: _isChecked[index],
-            onChanged: (bool? value) {
-              setState(() {
-                _isChecked[index] = value!;
-              });
-            },
-          );
-        },
-      ),
-      bottomNavigationBar: SizedBox(
-        height: 70,
-        child: ElevatedButton(
-          onPressed: () {
-            // 체크된 증상이 있는지 확인
-            bool isCheckedSymptomExist = _isChecked.contains(true);
-
-            if (!isCheckedSymptomExist) {
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: Text('증상 선택 필요'),
-                    content: Text('적어도 하나 이상의 증상을 선택해주세요.'),
-                    actions: [
-                      TextButton(
-                        child: Text('확인'),
-                        onPressed: () => Navigator.of(context).pop(),
-                      ),
-                    ],
-                  );
-                },
-              );
-              return; // 체크된 증상이 없으면 더 이상 진행하지 않음
-            }
-
-            // 선택한 부위와 증상을 가져와서 SearchResultPage로 전달
-            final selectedPart = {'id': widget.selectedPartId, 'name': widget.selectedPartName};
-            final selectedSymptoms = _symptoms.where((symptom) => _isChecked[_symptoms.indexOf(symptom)]).toList();
-
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => SearchResultPage(),
+        appBar: AppBar(
+          title: Text('${widget.selectedPartName} 관련 증상'),
+        ),
+        body: ListView.builder(
+          itemCount: _symptoms.length,
+          itemBuilder: (context, index) {
+            return CheckboxListTile(
+              title: Text(
+                _symptoms[index],
+                style: TextStyle(fontSize: 20),
               ),
+              value: _isChecked[index],
+              onChanged: (bool? value) {
+                setState(() {
+                  _isChecked[index] = value!;
+                });
+              },
             );
           },
-          child: Text('다음'),
         ),
-      ),
+        bottomNavigationBar: SizedBox(
+            height: 70,
+            child: ElevatedButton(
+            onPressed: () {
+        // 체크된 증상이 있는지 확인
+        bool isCheckedSymptomExist = _isChecked.contains(true);
+
+    if (!isCheckedSymptomExist) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('증상 선택 필요'),
+            content: Text('적어도 하나 이상의 증상을 선택해주세요.'),
+            actions: [
+              TextButton(
+                child: Text('확인'),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ],
+          );
+        },
+      );
+      return; // 체크된 증상이 없으면 더 이상 진행하지 않음
+    }
+
+    // 선택한 부위와 증상을 가져와서 SearchResultPage로 전달
+    final selectedPart = {'id': widget.selectedPartId, 'name': widget.selectedPartName};
+    final selectedSymptoms = _symptoms.where((symptom) => _isChecked[_symptoms.indexOf(symptom)]).toList();
+
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+        builder: (context) => SearchResultPage(
+        selectedPart: selectedPart.toString(),
+        selectedSymptoms: selectedSymptoms,
+        ),
+        ),
+    );
+            },
+              child: Text(
+                '검색하기',
+                style: TextStyle(fontSize: 24),
+              ),
+            ),
+        ),
     );
   }
 }
