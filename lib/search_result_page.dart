@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:apayo/hospital_search.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -95,7 +96,26 @@ class _SearchResultPageState extends State<SearchResultPage> {
                   return ListTile(
                     title: Text(snapshot.data![index].name),
                     subtitle: Text(snapshot.data![index].commonName),
-                    trailing: Text(snapshot.data?[index].recommendedSpecialistName ?? ''),
+                    trailing: GestureDetector(
+                      onTap: () {
+                        // TODO: 버튼을 눌렀을 때 실행할 코드 작성
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => HospitalSearchPage()),
+                        );
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.blue,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          '병원찾기',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ),
                   );
                 },
               );
