@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:apayo/hospital_search.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -47,7 +46,8 @@ class _SearchResultPageState extends State<SearchResultPage> {
           .map((e) => {'id': e['id'], 'choice_id': 'present'})
           .toList();
 
-      final recommendSpecialistUrl = 'https://api.infermedica.com/v3/recommend_specialist';
+      final recommendSpecialistUrl =
+          'https://api.infermedica.com/v3/recommend_specialist';
       final recommendSpecialistRequestBody = {
         'sex': 'male',
         'age': {'value': 30},
@@ -65,17 +65,80 @@ class _SearchResultPageState extends State<SearchResultPage> {
       );
 
       if (recommendSpecialistResponse.statusCode == 200) {
-        final recommendSpecialistResponseBody = jsonDecode(recommendSpecialistResponse.body);
-        final specialistName = recommendSpecialistResponseBody['recommended_specialist']['name'];
+        final recommendSpecialistResponseBody =
+            jsonDecode(recommendSpecialistResponse.body);
+        final specialistName =
+            recommendSpecialistResponseBody['recommended_specialist']['name'];
 
         for (var mention in mentions) {
           mention.recommendedSpecialistName = specialistName;
         }
       }
 
-      return mentions;
+      // 파파고 API 를 이용하여 name, commonName, recommendedSpecialistName 한글 변환
+      final String papagoClientId = "w4lp2Y2UYyYG96qVmqhY";
+      final String papagoClientSecret = "gLer4YYvvo";
+      final String contentType =
+          "application/x-www-form-urlencoded; charset=UTF-8";
+      final String papagoUrl = "https://openapi.naver.com/v1/papago/n2mt";
+
+      final futures = mentions.map((mention) async {
+        final name = await _translateTextUsingPapago(mention.name, 'en', 'ko',
+            papagoUrl, papagoClientId, papagoClientSecret, contentType);
+        final commonName = await _translateTextUsingPapago(
+            mention.commonName,
+            'en',
+            'ko',
+            papagoUrl,
+            papagoClientId,
+            papagoClientSecret,
+            contentType);
+        final recommendedSpecialistName = await _translateTextUsingPapago(
+            mention.recommendedSpecialistName,
+            'en',
+            'ko',
+            papagoUrl,
+            papagoClientId,
+            papagoClientSecret,
+            contentType);
+        mention.name = name;
+        mention.commonName = commonName;
+        mention.recommendedSpecialistName = recommendedSpecialistName;
+
+        return mention;
+      });
+
+      final results = await Future.wait(futures);
+      return results;
     } else {
       throw Exception('Failed to fetch data');
+    }
+  }
+
+  Future<String> _translateTextUsingPapago(
+      String text,
+      String source,
+      String target,
+      String url,
+      String clientId,
+      String clientSecret,
+      String contentType) async {
+    final response = await http.post(
+      Uri.parse(url),
+      headers: {
+        'Content-Type': contentType,
+        'X-Naver-Client-Id': clientId,
+        'X-Naver-Client-Secret': clientSecret,
+      },
+      body: {'source': source, 'target': target, 'text': text},
+    );
+    if (response.statusCode == 200) {
+      final responseBody = jsonDecode(response.body);
+      final translatedText =
+          responseBody['message']['result']['translatedText'];
+      return translatedText;
+    } else {
+      throw Exception('Failed to translate text');
     }
   }
 
@@ -83,49 +146,45 @@ class _SearchResultPageState extends State<SearchResultPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('검색 결과'),
+        title: Text('Search Result'),
       ),
-      body: Center(
-        child: FutureBuilder<List<Mention>>(
-          future: _fetchData(),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return ListView.builder(
-                itemCount: snapshot.data!.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return ListTile(
-                    title: Text(snapshot.data![index].name),
-                    subtitle: Text(snapshot.data![index].commonName),
-                    trailing: GestureDetector(
-                      onTap: () {
-                        // TODO: 버튼을 눌렀을 때 실행할 코드 작성
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => HospitalSearchPage()),
-                        );
-                      },
-                      child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Colors.blue,
-                          borderRadius: BorderRadius.circular(4),
+      body: FutureBuilder(
+        future: _fetchData(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            final List<Mention> mentions = snapshot.data as List<Mention>;
+            return ListView.builder(
+              itemCount: mentions.length,
+              itemBuilder: (context, index) {
+                final mention = mentions[index];
+                return ListTile(
+                  title: Text(mention.name),
+                  subtitle: Text(mention.commonName),
+                  trailing: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => HospitalSearchPage(
+                            recommendedSpecialistName: mention.recommendedSpecialistName, //유심히 볼만한 내용
+                          ),
                         ),
-                        child: Text(
-                          '병원찾기',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              );
-            } else if (snapshot.hasError) {
-              return Text('${snapshot.error}');
-            } else {
-              return const CircularProgressIndicator();
-            }
-          },
-        ),
+                      );
+                    },
+                    child: Text('Find hospital'),
+                  ),
+                );
+              },
+            );
+          } else if (snapshot.hasError) {
+            return Center(
+              child: Text('${snapshot.error}'),
+            );
+          }
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        },
       ),
     );
   }
@@ -133,15 +192,15 @@ class _SearchResultPageState extends State<SearchResultPage> {
 
 class Mention {
   final String id;
-  final String name;
-  final String commonName;
-  String? recommendedSpecialistName;
+  String name;
+  String commonName;
+  String recommendedSpecialistName;
 
   Mention({
     required this.id,
     required this.name,
     required this.commonName,
-    this.recommendedSpecialistName,
+    required this.recommendedSpecialistName,
   });
 
   factory Mention.fromJson(Map<String, dynamic> json) {
@@ -149,6 +208,7 @@ class Mention {
       id: json['id'],
       name: json['name'],
       commonName: json['common_name'],
+      recommendedSpecialistName: '',
     );
   }
 }

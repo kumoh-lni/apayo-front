@@ -1,10 +1,17 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:location/location.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class HospitalSearchPage extends StatefulWidget {
+  final String recommendedSpecialistName;
+
+  const HospitalSearchPage({Key? key, required this.recommendedSpecialistName})
+      : super(key: key);
+
   @override
   _HospitalSearchPageState createState() => _HospitalSearchPageState();
 }
@@ -24,7 +31,6 @@ class _HospitalSearchPageState extends State<HospitalSearchPage> {
     Location location = Location();
     bool serviceEnabled;
     PermissionStatus permissionStatus;
-
     serviceEnabled = await location.serviceEnabled();
     if (!serviceEnabled) {
       serviceEnabled = await location.requestService();
@@ -51,8 +57,43 @@ class _HospitalSearchPageState extends State<HospitalSearchPage> {
   }
 
   Future<void> _searchHospital() async {
-    // TODO: 현재 위치를 기반으로 병원 검색 수행
-    // 검색 결과는 검색 결과 페이지로 전달
+    String apiUrl = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json';
+    String location = '${_locationData!.latitude},${_locationData!.longitude}';
+    String type = 'hospital';
+    String keyword = widget.recommendedSpecialistName;
+    String apiKey = 'YOUR_API_KEY_HERE'; // TODO: Google Places API 키 입력
+    Uri uri = Uri.parse(
+        '$apiUrl?location=$location&type=$type&keyword=$keyword&radius=5000&key=$apiKey');
+
+    http.Response response = await http.get(uri);
+
+    if (response.statusCode == 200) {
+      dynamic jsonResponse = json.decode(response.body);
+      if (jsonResponse['status'] == 'OK') {
+        List<dynamic> hospitals = jsonResponse['results'];
+
+        // 검색 결과를 지도에 나타내기
+        GoogleMapController controller = await _controller.future;
+        Set<Marker> markers = Set<Marker>();
+        for (dynamic hospital in hospitals) {
+          double lat = hospital['geometry']['location']['lat'];
+          double lng = hospital['geometry']['location']['lng'];
+          String name = hospital['name'];
+          Marker marker = Marker(
+            markerId: MarkerId(name),
+            position: LatLng(lat, lng),
+            infoWindow: InfoWindow(title: name),
+          );
+          markers.add(marker);
+        }
+        controller.clearMarkers();
+        controller.addMarkers(markers.toList());
+      } else {
+        print('API Error: ${jsonResponse['status']}');
+      }
+    } else {
+      print('HTTP Error: ${response.statusCode}');
+    }
   }
 
   @override
