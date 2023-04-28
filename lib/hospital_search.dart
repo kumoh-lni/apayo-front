@@ -20,6 +20,7 @@ class _HospitalSearchPageState extends State<HospitalSearchPage> {
   Completer<GoogleMapController> _controller = Completer();
   CameraPosition? _currentPosition;
   LocationData? _locationData;
+  Set<Marker> _markers = {};
 
   @override
   void initState() {
@@ -73,21 +74,26 @@ class _HospitalSearchPageState extends State<HospitalSearchPage> {
         List<dynamic> hospitals = jsonResponse['results'];
 
         // 검색 결과를 지도에 나타내기
-        GoogleMapController controller = await _controller.future;
         Set<Marker> markers = Set<Marker>();
         for (dynamic hospital in hospitals) {
           double lat = hospital['geometry']['location']['lat'];
           double lng = hospital['geometry']['location']['lng'];
           String name = hospital['name'];
+          MarkerId id = MarkerId(name);
           Marker marker = Marker(
-            markerId: MarkerId(name),
+            markerId: id,
             position: LatLng(lat, lng),
             infoWindow: InfoWindow(title: name),
+            onTap: () {
+              _onMarkerTapped(id);
+            },
           );
           markers.add(marker);
         }
-        controller.clearMarkers();
-        controller.addMarkers(markers.toList());
+        setState(() {
+          _markers.clear();
+          _markers = markers;
+        });
       } else {
         print('API Error: ${jsonResponse['status']}');
       }
@@ -96,41 +102,46 @@ class _HospitalSearchPageState extends State<HospitalSearchPage> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('병원 찾기'),
-      ),
-      body: _currentPosition == null
-          ? Center(
-        child: CircularProgressIndicator(),
-      )
-          : GoogleMap(
-        mapType: MapType.normal,
-        initialCameraPosition: _currentPosition!,
-        onMapCreated: (GoogleMapController controller) {
-          _controller.complete(controller);
-        },
-        myLocationEnabled: true,
-      ),
-      floatingActionButton: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          FloatingActionButton(
-            onPressed: _searchHospital,
-            backgroundColor: Colors.blue,
-            child: Icon(Icons.search),
-          ),
-          SizedBox(height: 16.0),
-          FloatingActionButton(
-            onPressed: () {
-              Navigator.pop(context); // 현재 페이지를 스택에서 제거하고 이전 페이지로 이동
-            },
-            child: Icon(Icons.arrow_back),
-          ),
-        ],
-      ),
-    );
+  void _onMarkerTapped(MarkerId markerId) {
+    // TODO: 마커 탭 처리
   }
-}
+
+
+    @override
+    Widget build(BuildContext context) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text('병원 찾기'),
+        ),
+        body: _currentPosition == null
+            ? Center(
+          child: CircularProgressIndicator(),
+        )
+            : GoogleMap(
+          mapType: MapType.normal,
+          initialCameraPosition: _currentPosition!,
+          onMapCreated: (GoogleMapController controller) {
+            _controller.complete(controller);
+          },
+          myLocationEnabled: true,
+        ),
+        floatingActionButton: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            FloatingActionButton(
+              onPressed: _searchHospital,
+              backgroundColor: Colors.blue,
+              child: Icon(Icons.search),
+            ),
+            SizedBox(height: 16.0),
+            FloatingActionButton(
+              onPressed: () {
+                Navigator.pop(context); // 현재 페이지를 스택에서 제거하고 이전 페이지로 이동
+              },
+              child: Icon(Icons.arrow_back),
+            ),
+          ],
+        ),
+      );
+    }
+  }
