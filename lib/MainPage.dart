@@ -34,7 +34,7 @@ class MainPage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Image.asset(
-            'assets/hospital.jpg',
+            'assets/apayo_ico.png',
             width: 250,
             height: 250,
           ),

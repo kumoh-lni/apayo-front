@@ -39,7 +39,7 @@ class LoginPage extends StatelessWidget {
               height: 80.0,
             ),
             Image.asset(
-              'assets/apayo_logo.png',
+              'assets/apayo_ico.png',
               height: 150.0,
             ),
             SizedBox(

@@ -7,9 +7,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   const initializationSettingsAndroid =
-  AndroidInitializationSettings('app_icon');
+      AndroidInitializationSettings('app_icon');
   final initializationSettings =
-  InitializationSettings(android: initializationSettingsAndroid);
+      InitializationSettings(android: initializationSettingsAndroid);
 
   await FlutterLocalNotificationsPlugin().initialize(initializationSettings);
 
@@ -49,19 +49,20 @@ class _MedicineListPageState extends State<MedicineListPage> {
       ),
       body: _medicines.isEmpty
           ? const Center(
-        child: Text('복용 약이 없습니다.'),
-      )
+              child: Text('복용 약이 없습니다.'),
+            )
           : ListView.builder(
-        itemCount: _medicines.length,
-        itemBuilder: (context, index) {
-          return MedicineCard(medicine: _medicines[index]);
-        },
-      ),
+              itemCount: _medicines.length,
+              itemBuilder: (context, index) {
+                return MedicineCard(medicine: _medicines[index]);
+              },
+            ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           final newMedicine = await Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const RegisterMedicinePage()),
+            MaterialPageRoute(
+                builder: (context) => const RegisterMedicinePage()),
           );
           if (newMedicine != null) {
             setState(() {
@@ -146,6 +147,7 @@ class Medicine {
     this.weekdays = '',
   });
 }
+
 class RegisterMedicinePage extends StatefulWidget {
   const RegisterMedicinePage({Key? key}) : super(key: key);
 
@@ -173,7 +175,8 @@ class _RegisterMedicinePageState extends State<RegisterMedicinePage> {
       appBar: AppBar(
         title: const Text('새로운 약 추가'),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
+          child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
@@ -241,82 +244,88 @@ class _RegisterMedicinePageState extends State<RegisterMedicinePage> {
                   '요일 선택',
                   style: Theme.of(context).textTheme.subtitle1,
                 ),
-                CheckboxListTile(
-                  title: const Text('월'),
-                  value: _weekdays.contains('월'),
-                  onChanged: (value) {
-                    setState(() {
-                      _weekdays = _weekdays.contains('월')
-                          ? _weekdays.replaceAll('월', '').trim()
-                          : '$_weekdays 월';
-                    });
-                  },
-                ),
-                CheckboxListTile(
-                  title: const Text('화'),
-                  value: _weekdays.contains('화'),
-                  onChanged: (value) {
-                    setState(() {
-                      _weekdays = _weekdays.contains('화')
-                          ? _weekdays.replaceAll('화', '').trim()
-                          : '$_weekdays 화';
-                    });
-                  },
-                ),
-                CheckboxListTile(
-                  title: const Text('수'),
-                  value: _weekdays.contains('수'),
-                  onChanged: (value) {
-                    setState(() {
-                      _weekdays = _weekdays.contains('수')
-                          ? _weekdays.replaceAll('수', '').trim()
-                          : '$_weekdays 수';
-                    });
-                  },
-                ),
-                CheckboxListTile(
-                  title: const Text('목'),
-                  value: _weekdays.contains('목'),
-                  onChanged: (value) {
-                    setState(() {
-                      _weekdays = _weekdays.contains('목')
-                          ? _weekdays.replaceAll('목', '').trim()
-                          : '$_weekdays 목';
-                    });
-                  },
-                ),
-                CheckboxListTile(
-                  title: const Text('금'),
-                  value: _weekdays.contains('금'),
-                  onChanged: (value) {
-                    setState(() {
-                      _weekdays = _weekdays.contains('금')
-                          ? _weekdays.replaceAll('금', '').trim()
-                          : '$_weekdays 금';
-                    });
-                  },
-                ),
-                CheckboxListTile(
-                  title: const Text('토'),
-                  value: _weekdays.contains('토'),
-                  onChanged: (value) {
-                    setState(() {
-                      _weekdays = _weekdays.contains('토')
-                          ? _weekdays.replaceAll('토', '').trim()
-                          : '$_weekdays 토';
-                    });
-                  },
-                ),
-                CheckboxListTile(
-                  title: const Text('일'),
-                  value: _weekdays.contains('일'),
-                  onChanged: (value) {
-                    setState(() {
-                      _weekdays = _weekdays.contains('일')
-                          ? _weekdays.replaceAll('일', '').trim()
-                          : '$_weekdays 일';
-                    });
-                  },
+                SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      CheckboxListTile(
+                        title: const Text('월'),
+                        value: _weekdays.contains('월'),
+                        onChanged: (value) {
+                          setState(() {
+                            _weekdays = _weekdays.contains('월')
+                                ? _weekdays.replaceAll('월', '').trim()
+                                : '$_weekdays 월';
+                          });
+                        },
+                      ),
+                      CheckboxListTile(
+                        title: const Text('화'),
+                        value: _weekdays.contains('화'),
+                        onChanged: (value) {
+                          setState(() {
+                            _weekdays = _weekdays.contains('화')
+                                ? _weekdays.replaceAll('화', '').trim()
+                                : '$_weekdays 화';
+                          });
+                        },
+                      ),
+                      CheckboxListTile(
+                        title: const Text('수'),
+                        value: _weekdays.contains('수'),
+                        onChanged: (value) {
+                          setState(() {
+                            _weekdays = _weekdays.contains('수')
+                                ? _weekdays.replaceAll('수', '').trim()
+                                : '$_weekdays 수';
+                          });
+                        },
+                      ),
+                      CheckboxListTile(
+                        title: const Text('목'),
+                        value: _weekdays.contains('목'),
+                        onChanged: (value) {
+                          setState(() {
+                            _weekdays = _weekdays.contains('목')
+                                ? _weekdays.replaceAll('목', '').trim()
+                                : '$_weekdays 목';
+                          });
+                        },
+                      ),
+                      CheckboxListTile(
+                        title: const Text('금'),
+                        value: _weekdays.contains('금'),
+                        onChanged: (value) {
+                          setState(() {
+                            _weekdays = _weekdays.contains('금')
+                                ? _weekdays.replaceAll('금', '').trim()
+                                : '$_weekdays 금';
+                          });
+                        },
+                      ),
+                      CheckboxListTile(
+                        title: const Text('토'),
+                        value: _weekdays.contains('토'),
+                        onChanged: (value) {
+                          setState(() {
+                            _weekdays = _weekdays.contains('토')
+                                ? _weekdays.replaceAll('토', '').trim()
+                                : '$_weekdays 토';
+                          });
+                        },
+                      ),
+                      CheckboxListTile(
+                        title: const Text('일'),
+                        value: _weekdays.contains('일'),
+                        onChanged: (value) {
+                          setState(() {
+                            _weekdays = _weekdays.contains('일')
+                                ? _weekdays.replaceAll('일', '').trim()
+                                : '$_weekdays 일';
+                          });
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ],
               const SizedBox(height: 16.0),
@@ -337,7 +346,7 @@ class _RegisterMedicinePageState extends State<RegisterMedicinePage> {
             ],
           ),
         ),
-      ),
+      )),
     );
   }
 }
