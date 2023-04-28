@@ -62,7 +62,7 @@ class _HospitalSearchPageState extends State<HospitalSearchPage> {
     String location = '${_locationData!.latitude},${_locationData!.longitude}';
     String type = 'hospital';
     String keyword = widget.recommendedSpecialistName;
-    String apiKey = 'YOUR_API_KEY_HERE'; // TODO: Google Places API 키 입력
+    String apiKey = 'AIzaSyBYQFpEdgAhhjvcsIqb8VrMkOMcwVYCAKs'; // TODO: Google Places API 키 입력
     Uri uri = Uri.parse(
         '$apiUrl?location=$location&type=$type&keyword=$keyword&radius=5000&key=$apiKey');
 

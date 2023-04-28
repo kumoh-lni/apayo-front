@@ -43,7 +43,7 @@ class MainPage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               _buildButton(context, '병명 검색', SearchPage()),
-              _buildButton(context, '약 알림', AlarmPage()),
+              _buildButton(context, '약 알림', const MedicineListPage()),
             ],
           ),
           const SizedBox(height: 16),
