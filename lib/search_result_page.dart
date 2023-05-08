@@ -146,7 +146,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Search Result'),
+        title: Text('검색 결과'),
       ),
       body: FutureBuilder(
         future: _fetchData(),
@@ -171,7 +171,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
                         ),
                       );
                     },
-                    child: Text('Find hospital'),
+                    child: Text('병원 찾기'),
                   ),
                 );
               },

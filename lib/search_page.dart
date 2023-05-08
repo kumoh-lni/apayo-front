@@ -51,36 +51,47 @@ class _SearchPageState extends State<SearchPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('병명 검색'),
+        title: Text('부위 선택'),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: _bodyParts
-              .map(
-                (part) => Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: SizedBox(
-                width: 100,
-                height: 100,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => SymptomCheckPage(
-                          selectedPartId: part['id'],
-                          selectedPartName: part['name'],
-                        ),
-                      ),
-                    );
-                  },
-                  child: Text(part['name']),
+      body: GridView.builder(
+        padding: EdgeInsets.all(16.0),
+        itemCount: _bodyParts.length,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          mainAxisSpacing: 16.0,
+          crossAxisSpacing: 16.0,
+          childAspectRatio: 1.0,
+        ),
+        itemBuilder: (BuildContext context, int index) {
+          final part = _bodyParts[index];
+          return SizedBox(
+            width: 100,
+            height: 100,
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SymptomCheckPage(
+                      selectedPartId: part['id'],
+                      selectedPartName: part['name'],
+                    ),
+                  ),
+                );
+              },
+              child: Text(
+                part['name'],
+                style: TextStyle(fontSize: 22.0),
+              ),
+              style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30.0),
                 ),
+                padding: EdgeInsets.all(16.0),
               ),
             ),
-          )
-              .toList(),
-        ),
+          );
+        },
       ),
     );
   }

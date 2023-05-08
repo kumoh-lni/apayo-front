@@ -35,8 +35,9 @@ class _SymptomCheckPageState extends State<SymptomCheckPage> {
     try {
       final response = await client.get(Uri.parse(uri));
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        final symptoms = data['data'] as List<dynamic>;
+        final data = utf8.decode(response.bodyBytes); // utf8 디코딩 추가
+        final decodedData = json.decode(data);
+        final symptoms = decodedData['data'] as List<dynamic  >;
         setState(() {
           _symptoms = symptoms.map((s) => {
             'korean_description': s['korean_description'].toString(),
@@ -53,6 +54,7 @@ class _SymptomCheckPageState extends State<SymptomCheckPage> {
       client.close();
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -124,7 +126,7 @@ class _SymptomCheckPageState extends State<SymptomCheckPage> {
         );
             },
               child: Text(
-                '검색',
+                '결과 확인',
                 style: TextStyle(fontSize: 24),
               ),
             ),
