@@ -29,15 +29,15 @@ class _SymptomCheckPageState extends State<SymptomCheckPage> {
   }
 
   Future<void> _fetchData() async {
-    final String uri = 'http://10.0.2.2:8081/api/symptoms/${widget.selectedPartId}';
+    final String uri = 'https://apayo-vcos.run.goorm.site/part/${widget.selectedPartId}';
 
     final client = http.Client();
     try {
       final response = await client.get(Uri.parse(uri));
       if (response.statusCode == 200) {
-        final data = utf8.decode(response.bodyBytes); // utf8 디코딩 추가
+        final data = utf8.decode(response.bodyBytes);
         final decodedData = json.decode(data);
-        final symptoms = decodedData['data'] as List<dynamic  >;
+        final symptoms = decodedData as List<dynamic>; // 'data' 키는 없으므로 수정
         setState(() {
           _symptoms = symptoms.map((s) => {
             'korean_description': s['korean_description'].toString(),
@@ -54,6 +54,7 @@ class _SymptomCheckPageState extends State<SymptomCheckPage> {
       client.close();
     }
   }
+
 
 
   @override

@@ -14,7 +14,7 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
-  final String uri = 'http://10.0.2.2:8081/api/parts';
+  final String uri = 'https://apayo-vcos.run.goorm.site/part';
 
   List<Map<String, dynamic>> _bodyParts = [];
 
@@ -30,10 +30,10 @@ class _SearchPageState extends State<SearchPage> {
       final response = await client.get(Uri.parse(uri));
       if (response.statusCode == 200) {
         final data = utf8.decode(response.bodyBytes);
-        final parts = json.decode(data)['data'] as List<dynamic>;
+        final parts = json.decode(data) as List<dynamic>;
         setState(() {
           _bodyParts = parts.map<Map<String, dynamic>>((p) => {
-            'id': p['id'] as int,
+            'part_id': p['part_id'] as int,
             'name': p['name'].toString(),
           }).toList();
         });
@@ -73,7 +73,7 @@ class _SearchPageState extends State<SearchPage> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => SymptomCheckPage(
-                      selectedPartId: part['id'],
+                      selectedPartId: part['part_id'],
                       selectedPartName: part['name'],
                     ),
                   ),
