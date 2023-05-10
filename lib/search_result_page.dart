@@ -66,9 +66,9 @@ class _SearchResultPageState extends State<SearchResultPage> {
 
       if (recommendSpecialistResponse.statusCode == 200) {
         final recommendSpecialistResponseBody =
-            jsonDecode(recommendSpecialistResponse.body);
+        jsonDecode(recommendSpecialistResponse.body);
         final specialistName =
-            recommendSpecialistResponseBody['recommended_specialist']['name'];
+        recommendSpecialistResponseBody['recommended_specialist']['name'];
 
         for (var mention in mentions) {
           mention.recommendedSpecialistName = specialistName;
@@ -83,8 +83,14 @@ class _SearchResultPageState extends State<SearchResultPage> {
       final String papagoUrl = "https://openapi.naver.com/v1/papago/n2mt";
 
       final futures = mentions.map((mention) async {
-        final name = await _translateTextUsingPapago(mention.name, 'en', 'ko',
-            papagoUrl, papagoClientId, papagoClientSecret, contentType);
+        final name = await _translateTextUsingPapago(
+            mention.name,
+            'en',
+            'ko',
+            papagoUrl,
+            papagoClientId,
+            papagoClientSecret,
+            contentType);
         final commonName = await _translateTextUsingPapago(
             mention.commonName,
             'en',
@@ -115,8 +121,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
     }
   }
 
-  Future<String> _translateTextUsingPapago(
-      String text,
+  Future<String> _translateTextUsingPapago(String text,
       String source,
       String target,
       String url,
@@ -135,7 +140,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
     if (response.statusCode == 200) {
       final responseBody = jsonDecode(response.body);
       final translatedText =
-          responseBody['message']['result']['translatedText'];
+      responseBody['message']['result']['translatedText'];
       return translatedText;
     } else {
       throw Exception('Failed to translate text');
@@ -145,52 +150,143 @@ class _SearchResultPageState extends State<SearchResultPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[100],
       appBar: AppBar(
         title: Text('검색 결과'),
+        elevation: 0,
       ),
-      body: FutureBuilder(
-        future: _fetchData(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            final List<Mention> mentions = snapshot.data as List<Mention>;
-            return ListView.builder(
-              itemCount: mentions.length,
-              itemBuilder: (context, index) {
-                final mention = mentions[index];
-                return ListTile(
-                  title: Text(mention.name),
-                  subtitle: Text(mention.commonName),
-                  trailing: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => HospitalSearchPage(
-                            recommendedSpecialistName: mention.recommendedSpecialistName, //유심히 볼만한 내용
-                          ),
-                        ),
-                      );
-                    },
-                    child: Text('병원 찾기'),
-                  ),
-                );
-              },
-            );
-          } else if (snapshot.hasError) {
-            return Center(
-              child: Text('${snapshot.error}'),
-            );
-          }
-          return Center(
-            child: CircularProgressIndicator(),
-          );
-        },
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 16.0),
+            child: Text(
+              '!! 경고 !!',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 24,
+                color: Colors.red,
+              ),
+            ),
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '전문 의료진과 상담하지 않은 채로 이 어플을 사용하실 경우 건강에 해를 끼칠 수 있습니다. 상황에 따라 적절한 조치를 취하기 위해서는 반드시 전문 의료진의 조언을 들으시기 바랍니다.',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    SizedBox(height: 24),
+                    Text(
+                      '검색 결과',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 24,
+                        color: Colors.black,
+                      ),
+                    ),
+                    SizedBox(height: 24),
+                    FutureBuilder(
+                      future: _fetchData(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          final List<Mention> mentions = snapshot.data as List<Mention>;
+                          return Column(
+                            children: mentions.map((mention) {
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 16.0),
+                                child: Card(
+                                  elevation: 2,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: ListTile(
+                                    title: Text(
+                                      '병명: ${mention.name}',
+                                      style: TextStyle(fontSize: 20),
+                                    ),
+                                    subtitle: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        SizedBox(height: 8),
+                                        Text(
+                                          mention.commonName,
+                                          style: TextStyle(fontSize: 16),
+                                        ),
+                                        SizedBox(height: 8),
+                                        Text(
+                                          '권장 전문의: ${mention.recommendedSpecialistName}',
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            color: Colors.red,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    trailing: InkWell(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => HospitalSearchPage(
+                                              recommendedSpecialistName: mention.recommendedSpecialistName,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Image.asset(
+                                            'assets/hospital.png',
+                                            height: 32,
+                                          ),
+                                          SizedBox(height: 8),
+                                          Text(
+                                            '병원 찾기',
+                                            style: TextStyle(fontSize: 14),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          );
+                        } else if (snapshot.hasError) {
+                          return Center(
+                            child: Text('${snapshot.error}'),
+                          );
+                        }
+                        return Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
+
+
 }
 
-class Mention {
+  class Mention {
   final String id;
   String name;
   String commonName;

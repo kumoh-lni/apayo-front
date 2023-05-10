@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:location/location.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+
 class HospitalSearchPage extends StatefulWidget {
   final String recommendedSpecialistName;
 
@@ -39,7 +40,6 @@ class _HospitalSearchPageState extends State<HospitalSearchPage> {
         return;
       }
     }
-
     permissionStatus = await location.hasPermission();
     if (permissionStatus == PermissionStatus.denied) {
       permissionStatus = await location.requestPermission();
@@ -49,12 +49,10 @@ class _HospitalSearchPageState extends State<HospitalSearchPage> {
     }
 
     _locationData = await location.getLocation();
-    setState(() {
-      _currentPosition = CameraPosition(
-        target: LatLng(_locationData!.latitude!, _locationData!.longitude!),
-        zoom: 15.0,
-      );
-    });
+    _currentPosition = CameraPosition(
+      target: LatLng(_locationData!.latitude!, _locationData!.longitude!),
+      zoom: 15.0,
+    );
   }
 
   Future<void> _searchHospital() async {
@@ -62,7 +60,7 @@ class _HospitalSearchPageState extends State<HospitalSearchPage> {
     String location = '${_locationData!.latitude},${_locationData!.longitude}';
     String type = 'hospital';
     String keyword = widget.recommendedSpecialistName;
-    String apiKey = 'AIzaSyBYQFpEdgAhhjvcsIqb8VrMkOMcwVYCAKs'; // TODO: Google Places API 키 입력
+    String apiKey = 'YOUR_API_KEY'; // TODO: Google Places API 키 입력
     Uri uri = Uri.parse(
         '$apiUrl?location=$location&type=$type&keyword=$keyword&radius=5000&key=$apiKey');
 
@@ -106,42 +104,37 @@ class _HospitalSearchPageState extends State<HospitalSearchPage> {
     // TODO: 마커 탭 처리
   }
 
-
-    @override
-    Widget build(BuildContext context) {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text('병원 찾기'),
-        ),
-        body: _currentPosition == null
-            ? Center(
-          child: CircularProgressIndicator(),
-        )
-            : GoogleMap(
-          mapType: MapType.normal,
-          initialCameraPosition: _currentPosition!,
-          onMapCreated: (GoogleMapController controller) {
-            _controller.complete(controller);
-          },
-          myLocationEnabled: true,
-        ),
-        floatingActionButton: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            FloatingActionButton(
-              onPressed: _searchHospital,
-              backgroundColor: Colors.blue,
-              child: Icon(Icons.search),
-            ),
-            SizedBox(height: 16.0),
-            FloatingActionButton(
-              onPressed: () {
-                Navigator.pop(context); // 현재 페이지를 스택에서 제거하고 이전 페이지로 이동
-              },
-              child: Icon(Icons.arrow_back),
-            ),
-          ],
-        ),
-      );
-    }
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('병원 찾기'),
+      ),
+      body: GoogleMap(
+        mapType: MapType.normal,
+        initialCameraPosition: _currentPosition!,
+        onMapCreated: (GoogleMapController controller) {
+          _controller.complete(controller);
+        },
+        markers: _markers,
+      ),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+            onPressed: _searchHospital,
+            backgroundColor: Colors.blue,
+            child: Icon(Icons.search),
+          ),
+          SizedBox(height: 16.0),
+          FloatingActionButton(
+            onPressed: () {
+              Navigator.pop(context); // 현재 페이지를 스택에서 제거하고 이전 페이지로 이동
+            },
+            child: Icon(Icons.arrow_back),
+          ),
+        ],
+      ),
+    );
   }
+}

@@ -74,6 +74,11 @@ class MainPage extends StatelessWidget {
           text,
           style: const TextStyle(fontSize: 23),
         ),
+        style: ElevatedButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
       ),
     );
   }
