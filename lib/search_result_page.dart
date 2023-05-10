@@ -152,28 +152,38 @@ class _SearchResultPageState extends State<SearchResultPage> {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: Text('검색 결과'),
+        title: Text(
+          '검색 결과',
+          style: TextStyle(color: Colors.black),
+        ),
         elevation: 0,
+        centerTitle: true,
+        backgroundColor: Colors.transparent,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => Navigator.of(context).pop(),
+          color: Colors.black,
+        ),
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 16.0),
-            child: Text(
-              '!! 경고 !!',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 24,
-                color: Colors.red,
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24.0),
+              child: Text(
+                '!! 경고 !!',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24,
+                  color: Colors.red,
+                ),
               ),
             ),
-          ),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
+            Expanded(
+              child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -199,7 +209,8 @@ class _SearchResultPageState extends State<SearchResultPage> {
                       future: _fetchData(),
                       builder: (context, snapshot) {
                         if (snapshot.hasData) {
-                          final List<Mention> mentions = snapshot.data as List<Mention>;
+                          final List<Mention> mentions =
+                          snapshot.data as List<Mention>;
                           return Column(
                             children: mentions.map((mention) {
                               return Padding(
@@ -215,7 +226,8 @@ class _SearchResultPageState extends State<SearchResultPage> {
                                       style: TextStyle(fontSize: 20),
                                     ),
                                     subtitle: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                      CrossAxisAlignment.start,
                                       children: [
                                         SizedBox(height: 8),
                                         Text(
@@ -237,14 +249,17 @@ class _SearchResultPageState extends State<SearchResultPage> {
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) => HospitalSearchPage(
-                                              recommendedSpecialistName: mention.recommendedSpecialistName,
-                                            ),
+                                            builder: (context) =>
+                                                HospitalSearchPage(
+                                                  recommendedSpecialistName: mention
+                                                      .recommendedSpecialistName,
+                                                ),
                                           ),
                                         );
                                       },
                                       child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.center,
                                         children: [
                                           Image.asset(
                                             'assets/hospital.png',
@@ -263,7 +278,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
                               );
                             }).toList(),
                           );
-                        } else if (snapshot.hasError) {
+                        } else if (snapshot.hasError){
                           return Center(
                             child: Text('${snapshot.error}'),
                           );
@@ -277,8 +292,8 @@ class _SearchResultPageState extends State<SearchResultPage> {
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
