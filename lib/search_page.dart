@@ -38,10 +38,10 @@ class _SearchPageState extends State<SearchPage> {
           }).toList();
         });
       } else {
-        // handle error
+// handle error
       }
     } catch (e) {
-      // handle error
+// handle error
     } finally {
       client.close();
     }
@@ -51,24 +51,32 @@ class _SearchPageState extends State<SearchPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('부위 선택'),
-      ),
-      body: GridView.builder(
-        padding: EdgeInsets.all(16.0),
-        itemCount: _bodyParts.length,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          mainAxisSpacing: 16.0,
-          crossAxisSpacing: 16.0,
-          childAspectRatio: 1.0,
+        title: Text(
+          '부위 선택',
+          style: TextStyle(color: Colors.black),
         ),
-        itemBuilder: (BuildContext context, int index) {
-          final part = _bodyParts[index];
-          return SizedBox(
-            width: 100,
-            height: 100,
-            child: ElevatedButton(
-              onPressed: () {
+        centerTitle: true,
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ),
+      body: SafeArea(
+        child: GridView.builder(
+          padding: EdgeInsets.all(16.0),
+          itemCount: _bodyParts.length,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            mainAxisSpacing: 16.0,
+            crossAxisSpacing: 16.0,
+            childAspectRatio: 1.5,
+          ),
+          itemBuilder: (BuildContext context, int index) {
+            final part = _bodyParts[index];
+            return GestureDetector(
+              onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -79,19 +87,41 @@ class _SearchPageState extends State<SearchPage> {
                   ),
                 );
               },
-              child: Text(
-                part['name'],
-                style: TextStyle(fontSize: 22.0),
-              ),
-              style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20.0),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.3),
+                      blurRadius: 5.0,
+                      spreadRadius: 1.0,
+                      offset: Offset(0, 3),
+                    ),
+                  ],
                 ),
-                padding: EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.healing,
+                      color: Color(0xff5CCFD4),
+                      size: 50.0,
+                    ),
+                    SizedBox(height: 16.0),
+                    Text(
+                      part['name'],
+                      style: TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
