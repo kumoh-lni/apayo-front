@@ -30,7 +30,6 @@ class _SymptomCheckPageState extends State<SymptomCheckPage> {
 
   Future<void> _fetchData() async {
     final String uri = 'https://apayo-vcos.run.goorm.site/part/${widget.selectedPartId}';
-
     final client = http.Client();
     try {
       final response = await client.get(Uri.parse(uri));
@@ -55,84 +54,134 @@ class _SymptomCheckPageState extends State<SymptomCheckPage> {
     }
   }
 
-
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text('${widget.selectedPartName} 관련 증상'),
+      appBar: AppBar(
+        title: Text(
+          '증상 선택',
+          style: TextStyle(
+            color: Colors.black,
+          ),
         ),
-        body: ListView.builder(
+        centerTitle: true,
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => Navigator.of(context).pop(),
+          color: Colors.black,
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+        child: ListView.builder(
           itemCount: _symptoms.length,
           itemBuilder: (context, index) {
-            return CheckboxListTile(
-              title: Text(
-                _symptoms[index]['korean_description']!,
-                style: TextStyle(fontSize: 20),
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16.0),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.3),
+                      blurRadius: 10.0,
+                      spreadRadius: 1.0,
+                      offset: Offset(0.0, 0.0),
+                    )
+                  ],
+                ),
+                child: CheckboxListTile(
+                  contentPadding: EdgeInsets.symmetric(horizontal: 20.0),
+                  title: Text(
+                    _symptoms[index]['korean_description']!,
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  value: _isChecked[index],
+                  onChanged: (bool? value) {
+                    setState(() {
+                      _isChecked[index] = value!;
+                    });
+                  },
+                  activeColor: Color(0xff5CCFD4),
+                  controlAffinity: ListTileControlAffinity.leading,
+                  checkColor: Colors.white,
+                ),
               ),
-              value: _isChecked[index],
-              onChanged: (bool? value) {
-                setState(() {
-                  _isChecked[index] = value!;
-                });
-              },
             );
           },
         ),
-        bottomNavigationBar: SizedBox(
-            height: 70,
-            child: ElevatedButton(
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+        child: SizedBox(
+          height: 56.0,
+          child: ElevatedButton(
             onPressed: () {
-        // 체크된 증상이 있는지 확인
-        bool isCheckedSymptomExist = _isChecked.contains(true);
+              bool isCheckedSymptomExist = _isChecked.contains(true);
 
-    if (!isCheckedSymptomExist) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('증상 선택 필요'),
-            content: Text('적어도 하나 이상의 증상을 선택해주세요.'),
-            actions: [
-              TextButton(
-                child: Text('확인'),
-                onPressed: () => Navigator.of(context).pop(),
+              if (!isCheckedSymptomExist) {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text('증상 선택 필요'),
+                      content: Text('적어도 하나 이상의 증상을 선택해주세요.'),
+                      actions: [
+                        TextButton(
+                          child: Text('확인'),
+                          onPressed: () => Navigator.of(context).pop(),
+                        ),
+                      ],
+                    );
+                  },
+                );
+                return;
+              }
+
+              final selectedPart = {
+                'id': widget.selectedPartId,
+                'name': widget.selectedPartName
+              };
+              final selectedSymptoms = _symptoms
+                  .where((symptom) => _isChecked[_symptoms.indexOf(symptom)])
+                  .map((symptom) => symptom['english_description']!)
+                  .toList();
+
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => SearchResultPage(
+                    selectedPart: selectedPart.toString(),
+                    selectedSymptoms: selectedSymptoms,
+                  ),
+                ),
+              );
+            },
+            child: Text(
+              '결과 확인',
+              style: TextStyle(
+                fontSize: 18.0,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
               ),
-            ],
-          );
-        },
-      );
-      return; // 체크된 증상이 없으면 더 이상 진행하지 않음
-    }
-
-    // 선택한 부위와 증상을 가져와서 SearchResultPage로 전달
-    final selectedPart = {
-      'id': widget.selectedPartId,
-      'name': widget.selectedPartName
-    };
-    final selectedSymptoms = _symptoms
-        .where((symptom) => _isChecked[_symptoms.indexOf(symptom)])
-        .map((symptom) => symptom['english_description']!)
-        .toList();
-
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => SearchResultPage(
-              selectedPart: selectedPart.toString(),
-              selectedSymptoms: selectedSymptoms,
+            ),
+            style: ElevatedButton.styleFrom(
+              primary: Color(0xff5CCFD4),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16.0),
+              ),
             ),
           ),
-        );
-            },
-              child: Text(
-                '결과 확인',
-                style: TextStyle(fontSize: 24),
-              ),
-            ),
         ),
+      ),
     );
   }
+
 }
+
