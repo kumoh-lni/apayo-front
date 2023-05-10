@@ -46,14 +46,15 @@ class _SymptomCheckPageState extends State<SymptomCheckPage> {
           _isChecked = List<bool>.generate(_symptoms.length, (index) => false);
         });
       } else {
-        // handle error
+        throw Exception('서버 연결 오류');
       }
     } catch (e) {
-      // handle error
+      throw Exception('서버 연결 오류');
     } finally {
       client.close();
     }
   }
+
 
 
 
