@@ -170,23 +170,25 @@ class _SearchResultPageState extends State<SearchResultPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 24.0),
-              child: Text(
-                '!! 경고 !!',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 24,
-                  color: Colors.red,
-                ),
+            Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.red, width: 2),
+                borderRadius: BorderRadius.circular(16),
               ),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Text(
+                      '!! 경고 !!',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 24,
+                        color: Colors.red,
+                      ),
+                    ),
+                    SizedBox(height: 16),
                     Text(
                       '전문 의료진과 상담하지 않은 채로 이 어플을 사용하실 경우 건강에 해를 끼칠 수 있습니다. 상황에 따라 적절한 조치를 취하기 위해서는 반드시 전문 의료진의 조언을 들으시기 바랍니다.',
                       style: TextStyle(
@@ -195,7 +197,16 @@ class _SearchResultPageState extends State<SearchResultPage> {
                         color: Colors.black87,
                       ),
                     ),
-                    SizedBox(height: 24),
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(height: 24),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     Text(
                       '검색 결과',
                       style: TextStyle(
@@ -209,11 +220,11 @@ class _SearchResultPageState extends State<SearchResultPage> {
                       future: _fetchData(),
                       builder: (context, snapshot) {
                         if (snapshot.hasData) {
-                          final List<Mention> mentions =
-                          snapshot.data as List<Mention>;
+                          final List<Mention> mentions = snapshot.data as List<Mention>;
                           return Column(
-                            children: mentions.map((mention) {
-                              return Padding(
+                            children: mentions
+                                .map(
+                                  (mention) => Padding(
                                 padding: const EdgeInsets.only(bottom: 16.0),
                                 child: Card(
                                   elevation: 2,
@@ -226,8 +237,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
                                       style: TextStyle(fontSize: 20),
                                     ),
                                     subtitle: Column(
-                                      crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         SizedBox(height: 8),
                                         Text(
@@ -249,20 +259,16 @@ class _SearchResultPageState extends State<SearchResultPage> {
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) =>
-                                                HospitalSearchPage(
-                                                  recommendedSpecialistName: mention
-                                                      .recommendedSpecialistName,
-                                                ),
+                                            builder: (context) => HospitalSearchPage(
+                                              recommendedSpecialistName: mention.recommendedSpecialistName,
+                                            ),
                                           ),
                                         );
                                       },
                                       child: Column(
-                                        mainAxisAlignment:
-                                        MainAxisAlignment.center,
+                                        mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
-                                          Image.asset(
-                                            'assets/hospital.png',
+                                          Image.asset(                                          'assets/hospital.png',
                                             height: 32,
                                           ),
                                           SizedBox(height: 8),
@@ -275,10 +281,11 @@ class _SearchResultPageState extends State<SearchResultPage> {
                                     ),
                                   ),
                                 ),
-                              );
-                            }).toList(),
+                              ),
+                            )
+                                .toList(),
                           );
-                        } else if (snapshot.hasError){
+                        } else if (snapshot.hasError) {
                           return Center(
                             child: Text('${snapshot.error}'),
                           );
@@ -297,6 +304,8 @@ class _SearchResultPageState extends State<SearchResultPage> {
       ),
     );
   }
+
+
 
 
 }
