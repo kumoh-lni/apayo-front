@@ -22,6 +22,10 @@ class _SignUpPageState extends State<SignUpPage> {
     return Scaffold(
         appBar: AppBar(
           title: Text('회원가입'),
+          centerTitle: true,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          titleTextStyle: TextStyle(color: Colors.black),
         ),
         body: SingleChildScrollView(
           child: Padding(
@@ -139,6 +143,9 @@ class _SignUpPageState extends State<SignUpPage> {
                   Container(
                     width: double.infinity,
                     child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        primary: Color(0xff5CCFD4), // 버튼 색상 설정
+                      ),
                       onPressed: () {
                         if (_formKey.currentState?.validate() == true) {
                           // 회원가입 로직 처리
