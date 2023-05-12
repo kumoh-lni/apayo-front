@@ -65,9 +65,10 @@ class _HospitalSearchPageState extends State<HospitalSearchPage> {
     String apiUrl = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json';
     String location = '${_locationData!.latitude},${_locationData!.longitude}';
     String type = 'hospital';
-    String keyword = widget.recommendedSpecialistName;
+    String keyword = '병원';
     String apiKey = 'AIzaSyBYQFpEdgAhhjvcsIqb8VrMkOMcwVYCAKs'; // 자신의 API 키로 변경
     Uri uri = Uri.parse('$apiUrl?location=$location&type=$type&keyword=$keyword&radius=5000&key=$apiKey');
+    print(uri);
     http.Response response = await http.get(uri);
 
     if (response.statusCode == 200) {
@@ -148,8 +149,11 @@ class _HospitalSearchPageState extends State<HospitalSearchPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xff5CCFD4),  // 배경색을 Color(0xff5CCFD4)로 설정
       appBar: AppBar(
         title: Text('병원 찾기'),
+        centerTitle: true,
+        backgroundColor: Color(0xff5CCFD4),  // AppBar의 배경색을 Color(0xff5CCFD4)로 설정
       ),
       body: GoogleMap(
         mapType: MapType.normal,
@@ -167,7 +171,7 @@ class _HospitalSearchPageState extends State<HospitalSearchPage> {
         children: [
           FloatingActionButton(
             onPressed: _searchHospital,
-            backgroundColor: Colors.blue,
+            backgroundColor: Color(0xff5CCFD4),  // FloatingActionButton의 배경색을 Color(0xff5CCFD4)로 설정
             child: Icon(Icons.search),
           ),
           SizedBox(height: 16.0),
@@ -175,7 +179,7 @@ class _HospitalSearchPageState extends State<HospitalSearchPage> {
             onPressed: () {
               _getLocation();
             },
-            backgroundColor: Colors.blue,
+            backgroundColor: Color(0xff5CCFD4),  // FloatingActionButton의 배경색을 Color(0xff5CCFD4)로 설정
             child: Icon(Icons.my_location),
           ),
           SizedBox(height: 16.0),
@@ -183,10 +187,12 @@ class _HospitalSearchPageState extends State<HospitalSearchPage> {
             onPressed: () {
               Navigator.pop(context);
             },
+            backgroundColor: Color(0xff5CCFD4),  // FloatingActionButton의 배경색을 Color(0xff5CCFD4)로 설정
             child: Icon(Icons.arrow_back),
           ),
         ],
       ),
     );
   }
+
 }
