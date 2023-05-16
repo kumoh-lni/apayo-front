@@ -104,7 +104,7 @@ class MainPage extends StatelessWidget {
                 _buildButton(
                   context,
                   '약 알림',
-                  SearchPage(username: username),
+                  AlarmPage(),
                   Icon(Icons.notifications, size: 40, color: Colors.orange),
                 ),
               ],
