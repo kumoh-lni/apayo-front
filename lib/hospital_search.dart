@@ -55,7 +55,7 @@ class _HospitalSearchPageState extends State<HospitalSearchPage> {
     } else {
       _currentPosition = CameraPosition(
         target: LatLng(_locationData!.latitude!, _locationData!.longitude!),
-        zoom: 15.0,
+        zoom: 10.0,
       );
 
       final GoogleMapController controller = await _controller.future;
@@ -96,10 +96,15 @@ class _HospitalSearchPageState extends State<HospitalSearchPage> {
           );
           markers.add(marker);
         }
+
+        final GoogleMapController controller = await _controller.future;
+        controller.animateCamera(CameraUpdate.newLatLngZoom(_currentPosition!.target, 12.0));
+
         setState(() {
           _markers.clear();
           _markers = markers;
         });
+
         if (hospitals.isEmpty) {
           _showNoResultDialog();
         }
