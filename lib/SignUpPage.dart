@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 class SignUpPage extends StatefulWidget {
   @override
   _SignUpPageState createState() => _SignUpPageState();
@@ -14,8 +15,73 @@ class _SignUpPageState extends State<SignUpPage> {
   String? _selectedGender;
   int? _selectedBirthYear;
 
-  // 출생년도 선택용 드롭다운 메뉴에 사용될 아이템 리스트
+  final _apiUrl = 'https://apayo-vcos.run.goorm.site/register'; // 서버 API 주소
+
   final _birthYearList = List.generate(100, (index) => 2022 - index);
+
+  Future<void> registerUser() async {
+    final username = _idController.text;
+    final password = _passwordController.text;
+    final name = _nameController.text;
+    final birthYear = _selectedBirthYear;
+    final gender = _selectedGender;
+
+    // 요청에 필요한 데이터를 JSON 형태로 변환
+    final jsonData = {
+      'username': username,
+      'password': password,
+      'name': name,
+      'birth_year': birthYear,
+      'gender': gender,
+    };
+
+    try {
+      final response = await http.post(
+        Uri.parse(_apiUrl),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(jsonData),
+      );
+
+      final responseData = json.decode(response.body);
+
+      // 회원가입 성공 메시지 출력
+      if (responseData['message'] == 'User registered successfully') {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('회원가입 성공'),
+            content: Text('회원가입이 성공적으로 완료되었습니다.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pushNamed('/'); // main.dart로 이동
+                },
+                child: Text('확인'),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (error) {
+      // 오류 처리
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('오류 발생'),
+          content: Text('회원가입 중 오류가 발생했습니다.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('확인'),
+            ),
+          ],
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -149,6 +215,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       onPressed: () {
                         if (_formKey.currentState?.validate() == true) {
                           // 회원가입 로직 처리
+                          registerUser();
                         }
                       },
                       child: Text('회원가입'),
