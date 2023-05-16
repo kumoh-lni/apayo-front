@@ -6,27 +6,53 @@ import 'package:http/http.dart' as http;
 class SearchResultPage extends StatefulWidget {
   final String selectedPart;
   final List<String> selectedSymptoms;
+  final String username; // Add the username parameter
 
   const SearchResultPage({
     Key? key,
     required this.selectedPart,
     required this.selectedSymptoms,
+    required this.username, // Include the username parameter in the constructor
   }) : super(key: key);
 
   @override
   _SearchResultPageState createState() => _SearchResultPageState();
 }
-
 class _SearchResultPageState extends State<SearchResultPage> {
   final String _apiKey = 'bbde03096c0e6e24fa444625d507ae1d';
   List<Mention> mentions = [];
 
   Future<List<Mention>> _fetchData() async {
     final String url = 'https://api.infermedica.com/v3/parse';
+
+    final userResponse = await http.get(
+      Uri.parse('https://apayo-vcos.run.goorm.site/user/${widget.username}'),
+    );
+
+    int age = 30; // Default age value
+    String sex = 'male'; // Default gender value
+
+    if (userResponse.statusCode == 200) {
+      final userData = jsonDecode(userResponse.body);
+      age = userData['age'] as int? ?? 30;
+
+      final koreanGender = userData['gender'] as String?;
+      if (koreanGender != null) {
+        if (koreanGender == '남성') {
+          sex = 'male';
+        } else if (koreanGender == '여성') {
+          sex = 'female';
+        }
+      }
+    }
+    //print(age);
+    //print(sex);
     final Map<String, dynamic> requestBody = {
       "text": "${widget.selectedSymptoms.join(", ")}",
-      "age": {"value": 30}
+      "age": {"value": age},
+      "sex": sex,
     };
+
     final response = await http.post(
       Uri.parse(url),
       headers: {
@@ -49,8 +75,8 @@ class _SearchResultPageState extends State<SearchResultPage> {
       final recommendSpecialistUrl =
           'https://api.infermedica.com/v3/recommend_specialist';
       final recommendSpecialistRequestBody = {
-        'sex': 'male',
-        'age': {'value': 30},
+        'sex': sex,
+        'age': {'value': age},
         'evidence': evidence,
       };
 
@@ -74,6 +100,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
           mention.recommendedSpecialistName = specialistName;
         }
       }
+
 
       // 파파고 API 를 이용하여 name, commonName, recommendedSpecialistName 한글 변환
       final String papagoClientId = "w4lp2Y2UYyYG96qVmqhY";

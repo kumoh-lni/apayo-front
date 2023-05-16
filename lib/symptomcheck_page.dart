@@ -5,11 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class SymptomCheckPage extends StatefulWidget {
+  final String username; // username 추가
   final int selectedPartId;
   final String selectedPartName;
 
   const SymptomCheckPage({
     Key? key,
+    required this.username, // username 추가
     required this.selectedPartId,
     required this.selectedPartName,
   }) : super(key: key);
@@ -157,6 +159,7 @@ class _SymptomCheckPageState extends State<SymptomCheckPage> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => SearchResultPage(
+                    username: widget.username, // Pass the username
                     selectedPart: selectedPart.toString(),
                     selectedSymptoms: selectedSymptoms,
                   ),

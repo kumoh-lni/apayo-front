@@ -1,13 +1,15 @@
 import 'dart:convert';
-
+import 'package:http/http.dart' as http;
 import 'package:apayo/search_result_page.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+
 
 import 'symptomcheck_page.dart';
 
 class SearchPage extends StatefulWidget {
-  const SearchPage({Key? key}) : super(key: key);
+  final String username; // username 추가
+
+  const SearchPage({Key? key, required this.username}) : super(key: key);
 
   @override
   _SearchPageState createState() => _SearchPageState();
@@ -81,6 +83,7 @@ class _SearchPageState extends State<SearchPage> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => SymptomCheckPage(
+                      username: widget.username, // username 전달
                       selectedPartId: part['part_id'],
                       selectedPartName: part['name'],
                     ),

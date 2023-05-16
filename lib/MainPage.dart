@@ -4,6 +4,7 @@ import 'package:apayo/write_page.dart';
 import 'package:flutter/material.dart';
 
 import 'alarm_page.dart';
+import 'main.dart';
 
 void main() {
   runApp(const MyApp());
@@ -38,71 +39,115 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const MainPage(),
+      home: const MainPage(username: '',),
     );
   }
 }
-
 class MainPage extends StatelessWidget {
-  const MainPage({Key? key}) : super(key: key);
+  final String username; // username 추가
+
+  const MainPage({required this.username, Key? key}) : super(key: key);
+
+  void _logout(BuildContext context) {
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => LoginPage()),
+          (route) => false,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          '',
+          '아파요',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
         ),
         centerTitle: true,
         elevation: 0,
         backgroundColor: Colors.transparent,
         automaticallyImplyLeading: false,
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Image.asset(
-            'assets/apayo_ico.png',
-            width: 250,
-            height: 250,
-          ),
-          const SizedBox(height: 32),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _buildButton(
-                context,
-                '병명 검색',
-                SearchPage(),
-                Icon(Icons.search, size: 40),
+      body: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(
+              'assets/apayo_ico.png',
+              width: 250,
+              height: 250,
+            ),
+            const SizedBox(height: 32),
+            Text(
+              '안녕하세요 $username 님',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
               ),
-              _buildButton(
-                context,
-                '약 알림',
-                SearchPage(),
-                Icon(Icons.notifications, size: 40),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildButton(
+                  context,
+                  '병명 검색',
+                  SearchPage(username: username), // username 전달
+                  Icon(Icons.search, size: 40, color: Colors.blue),
+                ),
+                _buildButton(
+                  context,
+                  '약 알림',
+                  SearchPage(username: username),
+                  Icon(Icons.notifications, size: 40, color: Colors.orange),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildButton(
+                  context,
+                  '건강일지 작성',
+                  WritePage(),
+                  Icon(Icons.edit, size: 40, color: Colors.green),
+                ),
+                _buildButton(
+                  context,
+                  '건강일지 목록',
+                  ReadPage(),
+                  Icon(Icons.list, size: 40, color: Colors.purple),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            GestureDetector(
+              onTap: () => _logout(context),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.logout, size: 40, color: Colors.red),
+                  const SizedBox(width: 8),
+                  Text(
+                    '로그아웃',
+                    style: const TextStyle(
+                      fontSize: 26,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _buildButton(
-                context,
-                '건강일지 작성',
-                WritePage(),
-                Icon(Icons.edit, size: 40),
-              ),
-              _buildButton(
-                context,
-                '건강일지 목록',
-                ReadPage(),
-                Icon(Icons.list, size: 40),
-              ),
-            ],
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -111,7 +156,7 @@ class MainPage extends StatelessWidget {
       BuildContext context,
       String text,
       Widget page,
-      Icon icon
+      Icon icon,
       ) {
     return SizedBox(
       width: 180,
@@ -123,27 +168,24 @@ class MainPage extends StatelessWidget {
             MaterialPageRoute(builder: (context) => page),
           );
         },
-        icon: Icon(
-          icon.icon,
-          size: 40,
-          color: Color(0xff5CCFD4),
-        ),
+        icon: icon,
         label: Text(
           text,
           style: const TextStyle(
             fontSize: 23,
             color: Colors.black,
           ),
-          textAlign: TextAlign.center, // 가운데 정렬 추가
+          textAlign: TextAlign.center,
         ),
         style: ElevatedButton.styleFrom(
           primary: Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(50), // 동그란 모서리로 변경
+            borderRadius: BorderRadius.circular(50),
           ),
-          padding: EdgeInsets.symmetric(vertical: 16), // 버튼 높이 조정
+          padding: EdgeInsets.symmetric(vertical: 16),
         ),
       ),
     );
   }
 }
+

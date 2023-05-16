@@ -58,10 +58,13 @@ class _HospitalSearchPageState extends State<HospitalSearchPage> {
         zoom: 15.0,
       );
 
+      final GoogleMapController controller = await _controller.future;
+      controller.animateCamera(CameraUpdate.newCameraPosition(_currentPosition!));
     }
   }
 
   Future<void> _searchHospital() async {
+    await _getLocation();
     String apiUrl = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json';
     String location = '${_locationData!.latitude},${_locationData!.longitude}';
     String type = 'hospital';
