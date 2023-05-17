@@ -6,10 +6,7 @@ class AlarmPage extends StatefulWidget {
 }
 
 class _AlarmPageState extends State<AlarmPage> {
-  List<Medication> medications = [
-    Medication('약 이름 1', '10:00', '매일', true),
-    Medication('약 이름 2', '14:30', '월,수,금', false),
-  ];
+  List<Medication> medications = [];
 
   @override
   Widget build(BuildContext context) {
@@ -143,6 +140,7 @@ class _AlarmPageState extends State<AlarmPage> {
             }
           },
           child: Icon(Icons.add),
+          backgroundColor: Color(0xff5CCFD4), // Change the color here
         ),
       ),
     );
@@ -272,26 +270,69 @@ class AddMedicationPage extends StatefulWidget {
 
 class _AddMedicationPageState extends State<AddMedicationPage> {
   String name = '';
-  String time = '';
-  String days = '';
+  TimeOfDay time = TimeOfDay.now();
+  List<String> days = [];
   bool isOn = false;
+
+  void selectTime(BuildContext context) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (picked != null && picked != time)
+      setState(() {
+        time = picked;
+      });
+  }
+
+  void selectDays(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('요일 선택'),
+          content: MultiSelectChip(
+            allDays: ["월", "화", "수", "목", "금", "토", "일"],
+            selectedDays: days,
+            onSelectionChanged: (selectedList) {
+              setState(() {
+                days = selectedList;
+              });
+            },
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('확인'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('약 추가'),
+        title: Text('약 추가', style: TextStyle(color: Colors.black)),
+        backgroundColor: Colors.white,
+        iconTheme: IconThemeData(color: Colors.black),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(height: 16.0),
-            Icon(
-              Icons.local_hospital,
-              size: 80.0,
-              color: Color(0xff5CCFD4),
+            Center(
+              child: Icon(
+                Icons.local_hospital,
+                size: 80.0,
+                color: Color(0xff5CCFD4),
+              ),
             ),
             SizedBox(height: 16.0),
             Text(
@@ -299,6 +340,7 @@ class _AddMedicationPageState extends State<AddMedicationPage> {
               style: TextStyle(
                 fontSize: 24.0,
                 fontWeight: FontWeight.bold,
+                color: Colors.black,
               ),
             ),
             SizedBox(height: 16.0),
@@ -311,31 +353,21 @@ class _AddMedicationPageState extends State<AddMedicationPage> {
               decoration: InputDecoration(
                 labelText: '약 이름',
                 border: OutlineInputBorder(),
+                fillColor: Color(0xffe0f7fa),
+                filled: true,
               ),
             ),
             SizedBox(height: 16.0),
-            TextField(
-              onChanged: (value) {
-                setState(() {
-                  time = value;
-                });
-              },
-              decoration: InputDecoration(
-                labelText: '시간',
-                border: OutlineInputBorder(),
-              ),
+            ListTile(
+              title: Text(time == null ? '시간 선택' : time.format(context)),
+              trailing: Icon(Icons.arrow_drop_down),
+              onTap: () => selectTime(context),
             ),
             SizedBox(height: 16.0),
-            TextField(
-              onChanged: (value) {
-                setState(() {
-                  days = value;
-                });
-              },
-              decoration: InputDecoration(
-                labelText: '매일/요일',
-                border: OutlineInputBorder(),
-              ),
+            ListTile(
+              title: Text(days.isEmpty ? '요일 선택' : days.join(', ')),
+              trailing: Icon(Icons.arrow_drop_down),
+              onTap: () => selectDays(context),
             ),
             SizedBox(height: 16.0),
             SwitchListTile(
@@ -344,6 +376,7 @@ class _AddMedicationPageState extends State<AddMedicationPage> {
                 style: TextStyle(
                   fontSize: 16.0,
                   fontWeight: FontWeight.bold,
+                  color: Colors.black,
                 ),
               ),
               value: isOn,
@@ -352,51 +385,103 @@ class _AddMedicationPageState extends State<AddMedicationPage> {
                   isOn = value;
                 });
               },
+              activeColor: Color(0xff5CCFD4),
+              inactiveThumbColor: Colors.grey,
             ),
             SizedBox(height: 32.0),
-            ElevatedButton(
-              onPressed: () {
-                if (name.isNotEmpty && time.isNotEmpty && days.isNotEmpty) {
-                  Medication medication = Medication(name, time, days, isOn);
-                  Navigator.pop(context, medication);
-                } else {
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        title: Text('입력 오류'),
-                        content: Text('모든 필드를 입력해주세요.'),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: Text('확인'),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                primary: Color(0xff5CCFD4),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0),
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  if (name.isNotEmpty && time != null && days.isNotEmpty) {
+                    String formattedTime = "${time.hour}:${time.minute}";
+                    String joinedDays = days.join(', ');
+                    Medication medication = Medication(name, formattedTime, joinedDays, isOn);
+                    Navigator.pop(context, medication);
+                  } else {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: Text('입력 오류'),
+                          content: Text('모든 필드를 입력해주세요.'),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: Text('확인'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  primary: Color(0xff5CCFD4),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  padding: EdgeInsets.symmetric(vertical: 16.0),
                 ),
-                padding: EdgeInsets.symmetric(vertical: 16.0),
-              ),
-              child: Text(
-                '약 추가하기',
-                style: TextStyle(
-                  fontSize:21.0,
-                  fontWeight: FontWeight.bold,
+                child: Text(
+                  '약 추가하기',
+                  style: TextStyle(
+                    fontSize: 21.0,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class MultiSelectChip extends StatefulWidget {
+  final List<String> allDays;
+  final List<String> selectedDays;
+  final Function(List<String>) onSelectionChanged;
+
+  MultiSelectChip({required this.allDays, required this.selectedDays, required this.onSelectionChanged});
+
+  @override
+  _MultiSelectChipState createState() => _MultiSelectChipState();
+}
+
+class _MultiSelectChipState extends State<MultiSelectChip> {
+  List<String> selectedChoices = [];
+
+  _buildChoiceList() {
+    List<Widget> choices = [];
+
+    widget.allDays.forEach((item) {
+      choices.add(Container(
+        padding: const EdgeInsets.all(2.0),
+        child: ChoiceChip(
+          label: Text(item),
+          selected: widget.selectedDays.contains(item),
+          onSelected: (selected) {
+            setState(() {
+              widget.selectedDays.contains(item)
+                  ? widget.selectedDays.remove(item)
+                  : widget.selectedDays.add(item);
+              widget.onSelectionChanged(widget.selectedDays);
+            });
+          },
+        ),
+      ));
+    });
+
+    return choices;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      children: _buildChoiceList(),
     );
   }
 }
