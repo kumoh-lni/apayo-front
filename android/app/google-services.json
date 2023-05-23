@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "26785935836",
+    "project_id": "lni-apayo",
+    "storage_bucket": "lni-apayo.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:26785935836:android:5769f94ad2bc11e8435f19",
+        "android_client_info": {
+          "package_name": "kumoh.ac.kr.apayo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "26785935836-r9puu61iv4trbubcqf39mtpbavecci8v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAIEDmeBwZiuaV4AG8XUWLIl1-OcgP6OiM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "26785935836-r9puu61iv4trbubcqf39mtpbavecci8v.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
