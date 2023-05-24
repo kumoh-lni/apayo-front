@@ -9,6 +9,19 @@ class _AlarmPageState extends State<AlarmPage> {
   List<Medication> medications = [];
 
   @override
+  void initState() {
+    super.initState();
+    _addSampleMedications(); // 예시 약들 추가
+  }
+
+  void _addSampleMedications() {
+    Medication medication1 = Medication("약 예시 1", "10:00", "월, 수, 금", true);
+    Medication medication2 = Medication("약 예시 2", "14:30", "화, 목, 토", false);
+    Medication medication3 = Medication("약 예시 3", "19:00", "월, 화, 수, 목, 금, 토, 일", true);
+
+    medications.addAll([medication1, medication2, medication3]);
+  }
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -147,6 +160,7 @@ class _AlarmPageState extends State<AlarmPage> {
   }
 
   void _addMedication(Medication newMedication) {
+
     setState(() {
       medications.add(newMedication);
     });
