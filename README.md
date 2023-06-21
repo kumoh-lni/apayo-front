@@ -1,16 +1,32 @@
-# apayo
+# 🏥 APAYO (아파요) 프론트엔드 🚑
 
-apayo
+*의료 정보 및 자원에 대한 접근성을 개선하여 지역사회에 기여합니다!*
 
-## Getting Started
+🚨 **APAYO** 🚨 는 의료 지식이 부족하거나 특정 지역에 거주하는 등으로 인해 적절한 의료를 받지 못하는 사람들을 위해 설계된 혁신적인 모바일 어플리케이션입니다. 이 앱은 사용자의 증상을 입력받아 그에 따른 가능한 질병을 예측하고, 적절한 병원을 추천하여 의료 격차를 줄이는데 목표를 두고 있습니다.
 
-This project is a starting point for a Flutter application.
+## 🌟 주요 기능 
 
-A few resources to get you started if this is your first Flutter project:
+1. **증상 기반 병명 검색 기능**: 사용자가 증상을 입력하면, 해당 병명에 대한 정보를 제공합니다. 검색 결과로는 병명, 일반적인 이름, 그리고 권장 전문의가 제공됩니다.
+2. **병원 찾기 기능**: 검색 결과로 제공된 권장 전문의를 바탕으로, 사용자 주변에서 해당 전문의를 수용할 수 있는 병원의 위치를 지도를 통해 제공합니다.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## 🛠️ 기술 스택
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- **Infermedica API** (https://infermedica.com/): 사용자의 증상을 입력받아 예측 가능한 병명을 제공하는 API입니다.
+- **Google Map**: 병명에 대한 권장 전문의를 바탕으로, 현재 사용자 위치 기준으로 치료 가능한 병원을 지도에 마커로 표시하기 위해 사용하였습니다.
+- **Flutter(Dart)**: 크로스플랫폼 어플리케이션 개발을 위해 사용한 프레임워크입니다.
+- **GroomIDE, Express, MySQL**: 회원가입/로그인 서버를 구현하며, Bcrypt 해시 알고리즘을 사용하여 사용자 데이터를 암호화했습니다.
+- **Spring**: MySQL에 연결하여 부위별 증상 테이블에서 필요 데이터를 사용자에게 제공하기 위해 사용하였습니다.
+
+## 👥 팀 소개 
+
+- **박원준** ([GitHub](https://github.com/Recyclingbottle)): 로그인/회원 가입, 어플리케이션 개발을 맡았습니다. Flutter를 사용하여 어플리케이션의 프론트엔드를 담당하며, GroomIDE, Express, MySQL을 사용하여 로그인/회원가입 서버를 구현했습니다.
+- **김인찬** ([GitHub](https://github.com/kiminchan)): 데이터베이스 설계 및 관리, AWS 배포, 도메인 관리를 담당했습니다. MySQL 쿼리를 사용하여 부위와 부위별 증상의 목록을 데이터베이스에 추가하고 관리했습니다.
+- **정영한** ([GitHub](https://github.com/ynghan)): 데이터베이스 설계 및 관리, Spring Boot 서버 구축 및 관리를 맡았습니다. Java의 Spring boot를 사용하여 서버를 구축하고 API 요청 처리 로직을 구현했습니다. 또한, MySQL 데이터베이스 설계 및 관리도 담당했습니다.
+
+## 📆 프로젝트 일정
+
+- 2023.03.02 ~ 2023.03.28: 프로젝트 주제 선정 및 설계 (아이디어 선정, 주요 API 키 Infermedica 발급)
+- 2023.03.29 ~ 2023.04.20: 데이터베이스 설계 및 내용 추가, Spring boot 서버 구축
+- 2023.04.21 ~ 2023.05.18: Flutter 어플리케이션 개발, 주요 기능인 병명 예측 및 병원 찾기 기능 구현 완료
+- 2023.05.19 ~ 2023.06.03: 정보기술학회 "의료 격차 집단을 위한 증상 기반 병원 추천 시스템" 논문 작성 및 출품
+- 2023.06.03: 정보기술학회에서 논문 발표 진행
